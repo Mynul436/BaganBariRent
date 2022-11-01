@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 
 namespace BaganBari.Controllers
 {
@@ -15,23 +16,22 @@ namespace BaganBari.Controllers
 
     public class VillaAPIController : ControllerBase
     {
-        private readonly ILogging logger;
+        private readonly ApplicationDbcontext _db;
 
-        public VillaAPIController(ILogging logger)
+        public VillaAPIController(ApplicationDbcontext db)
         {
-            this.logger = logger;
+            _db = db;
         }
 
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+       // [ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<IEnumerable<VillaDto>> GetVillas()
         {
-            logger.Log("Getting all villas","");
-            return VillaStore.villaList;
+            return Ok(_db.Villas.ToList());
         }
         [HttpGet("{id:int}", Name = "GetVilla")]
 
@@ -44,14 +44,13 @@ namespace BaganBari.Controllers
         {
             if (id == 0)
             {
-                logger.Log("Get error with the Id " + id,"error");
                 return BadRequest();
             }
             if (id == null)
             {
                 return NotFound();
             }
-            var villa = VillaStore.villaList.FirstOrDefault(u => u.Id == id);
+            var villa = _db.Villas.FirstOrDefault(u => u.Id == id);
             return Ok(villa);
         }
 
@@ -68,7 +67,7 @@ namespace BaganBari.Controllers
             //    return BadRequest(ModelState);
             //}
 
-            if (VillaStore.villaList
+            if (_db.Villas
                 .FirstOrDefault(u => u.Name.ToLower() ==
             villaDto.Name.ToLower()) != null)
             {
@@ -85,10 +84,20 @@ namespace BaganBari.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
+            Villa model = new Villa()
+            {
+                Amenity=villaDto.Amenity,
+                Details=villaDto.Details,
+                Id=villaDto.Id,
+                Name=villaDto.Name,
+                ImageUrl=villaDto.ImageUrl,
+                Occupancy=villaDto.Occupancy,
+                Rate=villaDto.Rate,
+                Sqft=villaDto.Sqft
 
-            villaDto.Id = VillaStore.villaList
-                .OrderByDescending(u => u.Id)
-                .FirstOrDefault().Id + 1;
+            };
+                _db.Villas.Add(model);
+            _db.SaveChanges();
             VillaStore.villaList.Add(villaDto);
             return CreatedAtRoute("GetVilla", new { id = villaDto.Id }, villaDto);
 
@@ -107,12 +116,12 @@ namespace BaganBari.Controllers
                 return BadRequest();
             }
 
-            var villa=VillaStore.villaList.FirstOrDefault(u=>u.Id == id);
+            var villa=_db.Villas.FirstOrDefault(u=>u.Id == id);
  
             if(villa == null)
                 return NotFound();
-            VillaStore.villaList.Remove(villa);
-
+            _db.Villas.Remove(villa);
+            _db.SaveChanges();
             return NoContent();
         }
 
@@ -128,12 +137,25 @@ namespace BaganBari.Controllers
                 return BadRequest();
             }
 
-            var villa = VillaStore.villaList
-                .FirstOrDefault(u => u.Id == id);
-            villa.Name=villaDto.Name;
-            villa.Sqft = villaDto.Sqft;
-            villa.Occupancy = villaDto.Occupancy;
+            //var villa = _db.Villas
+            //    .FirstOrDefault(u => u.Id == id);
+            //villa.Name=villaDto.Name;
+            //villa.Sqft = villaDto.Sqft;
+            //villa.Occupancy = villaDto.Occupancy;
+            Villa model = new Villa()
+            {
+                Amenity = villaDto.Amenity,
+                Details = villaDto.Details,
+                Id = villaDto.Id,
+                Name = villaDto.Name,
+                ImageUrl = villaDto.ImageUrl,
+                Occupancy = villaDto.Occupancy,
+                Rate = villaDto.Rate,
+                Sqft = villaDto.Sqft
 
+            };
+            _db.Villas.Update(model);
+            _db.SaveChanges();
             return NoContent();
 
         }
@@ -147,11 +169,37 @@ namespace BaganBari.Controllers
             {
                 return BadRequest();
             }
-            var villa=VillaStore.villaList.FirstOrDefault(u => u.Id == id); 
-            if(villa==null)
+            var villa=_db.Villas.AsNoTracking().FirstOrDefault(u => u.Id == id);
+            VillaDto villaDto = new ()
+            {
+                Amenity = villa.Amenity,
+                Details = villa.Details,
+                Id = villa.Id,
+                Name = villa.Name,
+                ImageUrl = villa.ImageUrl,
+                Occupancy = villa.Occupancy,
+                Rate = villa.Rate,
+                Sqft = villa.Sqft
+
+            };
+            if (villa==null)
                 return BadRequest();
-            patcDto.ApplyTo(villa,ModelState);
-            if(!ModelState.IsValid)
+            patcDto.ApplyTo(villaDto,ModelState);
+            Villa model = new Villa()
+            {
+                Amenity = villaDto.Amenity,
+                Details = villaDto.Details,
+                Id = villaDto.Id,
+                Name = villaDto.Name,
+                ImageUrl = villaDto.ImageUrl,
+                Occupancy = villaDto.Occupancy,
+                Rate = villaDto.Rate,
+                Sqft = villaDto.Sqft
+
+            };
+            _db.Update(model);
+            _db.SaveChanges();
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return NoContent();
         }
