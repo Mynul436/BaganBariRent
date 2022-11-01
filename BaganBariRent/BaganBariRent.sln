@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaganBari", "BaganBari\BaganBari.csproj", "{EF46B8C3-7E3C-41F7-B1EB-B0B6FD5F8896}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EF46B8C3-7E3C-41F7-B1EB-B0B6FD5F8896}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF46B8C3-7E3C-41F7-B1EB-B0B6FD5F8896}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF46B8C3-7E3C-41F7-B1EB-B0B6FD5F8896}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF46B8C3-7E3C-41F7-B1EB-B0B6FD5F8896}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F62B739D-A90A-48DA-9F09-43D59F5F4ED4}
+	EndGlobalSection
+EndGlobal
